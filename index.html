@@ -1,0 +1,1142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Caveat:wght@600;700&family=Permanent+Marker&family=Tilt+Neon&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#25233f; --black:#0b0a10; --coral:#ff6b4a; --sky:#6cc4ee;
+    --mint:#7de3a8; --pink:#ff5fa2; --red:#e5484d; --cream:#fbf7ee; --peach:#f3c38f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--black);color:#fff;overflow-x:hidden}
+  html{scrollbar-gutter:stable}
+  html.locked,html.locked body{overflow:hidden;overscroll-behavior:none}
+  body{font-family:'Caveat',cursive}
+
+  /* chalkboard grain over everything */
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.16;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  #particles{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+  .vignette{position:fixed;inset:0;pointer-events:none;z-index:49;
+    background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.45) 100%)}
+
+  .scene{position:relative;height:100vh;height:100svh;width:100%;overflow:hidden;background:var(--bg,var(--navy))}
+  .stage{position:absolute;inset:0}
+
+  /* ---------- neon ---------- */
+  .neon{font-family:'Tilt Neon',sans-serif;line-height:.95;letter-spacing:.05em;text-align:center;
+    color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.13);transition:none}
+  .neon.on{color:#fff;-webkit-text-stroke:0;
+    text-shadow:0 0 3px #fff,0 0 10px var(--g),0 0 24px var(--g),0 0 52px var(--g),0 0 90px var(--g)}
+
+  /* ---------- intro ---------- */
+  .intro{--bg:var(--black);display:grid;place-items:center}
+  .intro .neon-wrap{display:flex;flex-direction:column;align-items:center;gap:.1em}
+  .intro .neon{font-size:clamp(58px,14vw,200px)}
+  .intro .sub{margin-top:28px;font-size:clamp(26px,4vw,44px);color:#cfd3ff;text-align:center}
+  .intro .center{display:flex;flex-direction:column;align-items:center;padding:0 16px}
+  .chev{position:absolute;bottom:4vh;left:50%;transform:translateX(-50%);width:54px}
+  .chev polyline{fill:none;stroke:#bff4ff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;
+    filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 10px #39d4ff)}
+
+  /* ---------- portal (zoom-through transition) ---------- */
+  .morph{position:absolute;inset:0;width:100%;height:100%;z-index:30;pointer-events:none;overflow:visible}
+  .morph path{fill:var(--next);stroke:#fff;stroke-width:.5;stroke-linejoin:round;opacity:0}
+
+  /* ---------- chapter ---------- */
+  .meta{position:absolute;top:4.5vh;left:0;right:0;text-align:center;font-size:clamp(20px,2.6vw,30px);
+    color:var(--ink);opacity:.8;letter-spacing:.02em}
+  .title-wrap{position:absolute;top:9vh;left:0;right:0;display:flex;justify-content:center;padding:0 16px;z-index:5}
+  .title{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:0 .25em;
+    text-align:center;line-height:.9}
+  .w{display:inline-block;will-change:transform}
+  .w.caps{font-family:'Amatic SC',cursive;font-weight:700;font-size:clamp(64px,11vw,168px)}
+  .w.marker{font-family:'Permanent Marker',cursive;font-size:clamp(40px,7.6vw,118px)}
+  .w.script{font-family:'Caveat',cursive;font-weight:700;font-size:clamp(46px,7vw,108px)}
+  .rays{position:absolute;left:50%;top:50%;width:150%;height:210%;transform:translate(-50%,-50%);
+    overflow:visible;pointer-events:none;z-index:-1}
+  .rays line{stroke:var(--ink);stroke-width:3;stroke-linecap:round;opacity:.85}
+
+  .pol{position:absolute;width:clamp(150px,min(20vw,34vh),285px);background:var(--cream);padding:10px 10px 0;
+    border-radius:3px;box-shadow:9px 9px 0 var(--a1);z-index:4;will-change:transform}
+  .pol::before{content:"";position:absolute;top:-14px;left:50%;width:84px;height:28px;
+    transform:translateX(-50%) rotate(-4deg);background:rgba(255,240,200,.55);
+    box-shadow:0 1px 2px rgba(0,0,0,.15)}
+  .pol .img{aspect-ratio:4/5;overflow:hidden;background:#ddd;position:relative}
+  .pol img,.pol video{width:100%;height:100%;object-fit:cover;display:block}
+  .pol figcaption{font-family:'Caveat',cursive;font-weight:700;color:var(--navy);
+    font-size:clamp(18px,1.8vw,26px);text-align:center;padding:6px 4px 10px;line-height:1}
+  .img.ph{background:repeating-linear-gradient(45deg,#e9e2d2 0 12px,#f1ebde 12px 24px);
+    display:grid;place-items:center;color:#8a8273;font-family:'Caveat',cursive;font-weight:700;
+    font-size:clamp(18px,2vw,26px)}
+  .img.ph svg{width:42%;stroke:#8a8273;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  .img.ph .lbl{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .p0{left:7%;top:36%}
+  .p1{left:50%;top:43%;margin-left:calc(clamp(150px,min(20vw,34vh),285px) / -2)}
+  .p2{right:7%;top:33%}
+
+  .bubble{position:absolute;max-width:min(36vw,420px);padding:18px 26px;border-radius:44px;
+    background:var(--bb);color:var(--bf);font-family:'Amatic SC',cursive;font-weight:700;
+    font-size:clamp(26px,2.9vw,42px);line-height:1;z-index:6;box-shadow:6px 6px 0 var(--ink)}
+  .bubble::after{content:"";position:absolute;bottom:-20px;width:34px;height:30px;background:var(--bb);
+    clip-path:polygon(0 0,100% 0,20% 100%)}
+  .b0{left:5%;bottom:7vh}
+  .b0::after{left:34px}
+  .b1{right:5%;bottom:13vh}
+  .b1::after{right:34px;clip-path:polygon(0 0,100% 0,80% 100%)}
+
+  .spark{position:absolute;width:clamp(28px,3.4vw,52px);z-index:7;overflow:visible}
+  .spark path{fill:var(--sp);stroke:var(--ink);stroke-width:3;stroke-linejoin:round}
+  .squig{position:absolute;width:clamp(120px,16vw,220px);overflow:visible;z-index:3}
+  .squig path{fill:none;stroke:var(--a2);stroke-width:6;stroke-linecap:round}
+
+  /* ---------- music button (hand-drawn vinyl) ---------- */
+  .music{position:fixed;right:18px;bottom:18px;z-index:60;width:66px;height:66px;padding:0;border:0;background:none;
+    cursor:pointer;filter:drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(3px 5px 5px rgba(0,0,0,.45))}
+  .music svg{width:100%;height:100%;display:block;overflow:visible}
+  .music:focus-visible{outline:3px dashed #f3c38f;outline-offset:6px;border-radius:50%}
+  .music .slash{opacity:1;transition:opacity .3s}
+  .music.playing .slash{opacity:0}
+  .music-hint{position:fixed;right:96px;bottom:34px;z-index:60;font-family:'Caveat',cursive;font-weight:700;
+    font-size:24px;color:#fff;background:#ff5fa2;padding:4px 14px 6px;border-radius:20px;box-shadow:4px 4px 0 #fff;
+    pointer-events:none;white-space:nowrap;opacity:0}
+  .music-hint::after{content:"";position:absolute;right:-12px;top:50%;margin-top:-7px;border:7px solid transparent;border-left:12px solid #ff5fa2}
+  @media (max-width:760px){
+    .music{width:54px;height:54px;right:14px;bottom:14px}
+    .music-hint{right:80px;bottom:26px;font-size:20px}
+  }
+
+  /* ---------- stickers (die-cut look: white outline + soft shadow) ---------- */
+  .sticker{position:absolute;width:46%;aspect-ratio:1;z-index:3;pointer-events:none;overflow:visible;
+    filter:drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff)
+           drop-shadow(3px 5px 4px rgba(0,0,0,.35))}
+  .sticker.tl{top:-9%;left:-16%}
+  .sticker.tr{top:-9%;right:-16%}
+  .sticker.bl{bottom:7%;left:-17%}
+  .sticker.br{bottom:7%;right:-17%}
+  .scard .sticker{width:36%}
+
+  /* ---------- tic tac toe ---------- */
+  .game{--bg:#25233f;--ink:#fff}
+  .game .stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6vh;padding:0 16px}
+  .game .title{position:relative}
+  .game .w.caps{font-size:clamp(52px,7.5vw,110px)}
+  .game .w.marker{font-size:clamp(38px,5.4vw,80px)}
+  .game .w.script{font-size:clamp(40px,5vw,76px)}
+  .game .hint{font-family:'Caveat',cursive;font-weight:700;font-size:clamp(22px,2.4vw,32px);color:#cfd3ff;text-align:center;min-height:1.2em}
+  .board{position:relative;width:min(80vw,54vh,460px);aspect-ratio:1}
+  .board svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .board .grid path{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round}
+  .board .marks path{fill:none;stroke-width:12;stroke-linecap:round;stroke-linejoin:round}
+  .board .marks .x{stroke:#ff6b4a;filter:drop-shadow(4px 4px 0 rgba(255,255,255,.9))}
+  .board .marks .o{stroke:#6cc4ee;filter:drop-shadow(4px 4px 0 rgba(255,255,255,.9))}
+  .board .strike{fill:none;stroke:#7de3a8;stroke-width:14;stroke-linecap:round;opacity:0;
+    filter:drop-shadow(0 0 6px #7de3a8)}
+  .cells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
+  .cells button{background:transparent;border:0;cursor:pointer;border-radius:18px;transition:background .2s}
+  .cells button:hover:not(:disabled){background:rgba(255,255,255,.07)}
+  .cells button:disabled{cursor:default}
+  .cells button:focus-visible{outline:3px dashed #f3c38f;outline-offset:-8px}
+  .win-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:20;pointer-events:none;text-align:center;padding:0 16px;visibility:hidden}
+  .win-msg .card{background:#ff5fa2;color:#fff;border-radius:48px;padding:3vh 6vw;box-shadow:10px 10px 0 #fff;
+    display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:0 .3em;max-width:min(90vw,900px)}
+  .win-msg .w.caps{font-size:clamp(56px,8vw,120px);color:#fff}
+  .win-msg .w.script{font-size:clamp(40px,5.5vw,84px);color:#25233f}
+  .win-msg .w.marker{font-size:clamp(40px,5.5vw,84px);color:#ffd36b}
+
+  /* ---------- sort-the-photos game ---------- */
+  .sortgame{--cw:clamp(120px,min(18vw,31vh),240px)}
+  .slots{display:grid;grid-template-columns:repeat(4,auto);gap:clamp(12px,2vw,28px);justify-content:center}
+  .slot{width:calc(var(--cw) + 18px);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .slot .well{width:100%;height:calc(var(--cw) * 1.25 + 52px);border:3px dashed rgba(255,255,255,.35);border-radius:14px;
+    display:grid;place-items:center;transition:border-color .3s,background .3s}
+  .slot.hot .well{border-color:#f3c38f;background:rgba(243,195,143,.1)}
+  .slot.good .well{border-color:#7de3a8;border-style:solid}
+  .slot .num{font-family:'Amatic SC',cursive;font-weight:700;font-size:clamp(22px,2.2vw,32px);color:#cfd3ff;line-height:1}
+  .scard{width:var(--cw);background:var(--cream);padding:8px 8px 0;border-radius:3px;box-shadow:7px 7px 0 var(--sc);
+    cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;position:relative}
+  .scard:active{cursor:grabbing}
+  .scard.sel{outline:4px solid #f3c38f;outline-offset:4px}
+  .scard .img{aspect-ratio:4/5;overflow:hidden;background:#ddd;position:relative;pointer-events:none}
+  .scard img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .scard figcaption{font-family:'Caveat',cursive;font-weight:700;color:var(--navy);font-size:clamp(16px,1.6vw,22px);
+    text-align:center;padding:5px 2px 8px;line-height:1;pointer-events:none}
+  @media (max-width:760px){
+    .sortgame{--cw:min(36vw,19vh)}
+    .slots{grid-template-columns:repeat(2,auto);gap:10px 14px}
+    .slot .well{height:calc(var(--cw) * 1.25 + 44px)}
+    .scard{padding:5px 5px 0;box-shadow:5px 5px 0 var(--sc)}
+  }
+
+  /* ---------- finale ---------- */
+  .finale{--bg:var(--black);display:grid;place-items:center}
+  .finale .center{position:relative;display:flex;flex-direction:column;align-items:center;z-index:3;padding:0 16px}
+  .finale .neon{font-size:clamp(52px,12vw,170px)}
+  .heart{position:absolute;left:50%;top:50%;width:min(92vw,720px);transform:translate(-50%,-52%);overflow:visible;z-index:1}
+  .heart path{fill:none;stroke:rgba(255,255,255,.12);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+  .heart.on path{stroke:#ffd9e2;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 12px #ff3b6b) drop-shadow(0 0 34px #ff3b6b)}
+  .finale .name{font-family:'Caveat',cursive;font-weight:700;color:var(--peach);
+    font-size:clamp(54px,9vw,130px);line-height:1;margin-top:10px}
+  .finale .sign{font-family:'Amatic SC',cursive;font-weight:700;font-size:clamp(26px,3vw,40px);
+    color:#cfd3ff;margin-top:clamp(40px,9vh,90px);letter-spacing:.04em;text-shadow:0 0 8px #0b0a10,0 0 16px #0b0a10}
+  .confetti{position:absolute;left:50%;top:50%;z-index:2;pointer-events:none}
+
+  @media (max-width:760px){
+    .title-wrap{top:10vh}
+    .pol{width:40vw;padding:6px 6px 0;box-shadow:6px 6px 0 var(--a1)}
+    .pol::before{width:56px;height:20px;top:-10px}
+    .p0{left:4%;top:29%}
+    .p1{left:50%;top:51%;margin-left:-20vw}
+    .p2{left:auto;right:4%;top:35%}
+    .bubble{max-width:72vw;font-size:26px;padding:12px 18px}
+    .b0{left:4%;bottom:15vh}
+    .b1{right:4%;bottom:5vh}
+    .rays{width:120%;height:180%}
+  }
+</style>
+</head>
+<body>
+<canvas id="particles" aria-hidden="true"></canvas>
+<audio id="song" src="music/count-on-me.mp3" loop preload="auto"></audio>
+<button class="music" type="button" aria-label="play music" aria-pressed="false">
+  <svg viewBox="0 0 100 100" aria-hidden="true">
+    <g class="disc">
+      <circle cx="50" cy="50" r="46" fill="#151321" stroke="#25233f" stroke-width="3"/>
+      <circle cx="50" cy="50" r="38" fill="none" stroke="#3a3758" stroke-width="2"/>
+      <circle cx="50" cy="50" r="31" fill="none" stroke="#3a3758" stroke-width="2"/>
+      <path d="M22 34 Q30 20 46 16" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+      <circle cx="50" cy="50" r="19" fill="#ff6b4a" stroke="#25233f" stroke-width="3"/>
+      <path d="M38 50 Q50 40 62 50" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="50" cy="50" r="3.5" fill="#151321"/>
+    </g>
+    <path class="slash" d="M18 82 L82 18" stroke="#ff5fa2" stroke-width="8" stroke-linecap="round"/>
+  </svg>
+</button>
+<div class="music-hint">tap anywhere for music ♪</div>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div id="smooth-wrapper"><div id="smooth-content">
+
+  <section class="scene intro" id="intro" style="--next:var(--navy)">
+    <div class="stage">
+      <div class="center" style="position:absolute;inset:0;justify-content:center">
+        <div class="neon-wrap">
+          <div class="neon n1" style="--g:#ff3b8d">HAPPY</div>
+          <div class="neon n2" style="--g:#22c9ff">BIRTHDAY</div>
+        </div>
+        <p class="sub">a little story about us…</p>
+      </div>
+      <svg class="chev" viewBox="0 0 60 90" aria-hidden="true">
+        <polyline points="10,10 30,28 50,10"/><polyline points="10,36 30,54 50,36"/><polyline points="10,62 30,80 50,62"/>
+      </svg>
+    </div>
+    <svg class="morph" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><path/></svg>
+  </section>
+
+  <div id="chapters"></div>
+
+  <section class="scene finale" id="finale">
+    <svg class="heart" viewBox="0 0 200 180" aria-hidden="true">
+      <path d="M100,168 C44,124 8,94 8,52 C8,25 29,8 54,8 C74,8 91,20 100,38 C109,20 126,8 146,8 C171,8 192,25 192,52 C192,94 156,124 100,168Z"/>
+    </svg>
+    <div class="confetti"></div>
+    <div class="center">
+      <div class="neon f1" style="--g:#22c9ff">HAPPY</div>
+      <div class="neon f2" style="--g:#ff3b8d">BIRTHDAY</div>
+      <p class="name"></p>
+      <p class="sign"></p>
+    </div>
+  </section>
+
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollSmoother.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MorphSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
+<script>
+/* =========================================================
+   EDIT HERE — names, chapters, text, photos
+   Photos go in the "photos" folder next to this file.
+   A missing photo shows a striped placeholder.
+   ========================================================= */
+const NAME = "Maloka";
+const SIGNATURE = "love you, always — Abada";
+
+const CHAPTERS = [
+  { meta:"chapter one · where it all started",
+    colors:{bg:"#25233f", ink:"#ffffff", words:["#ff6b4a","#ffffff","#6cc4ee"], a1:"#6cc4ee", a2:"#ff6b4a", sp:"#f3c38f",
+            bubbles:[["#7de3a8","#25233f"],["#ff6b4a","#ffffff"]]},
+    words:[["SEA","caps"],["salt &","script"],["SUNSHINE","marker"]],
+    photos:[{src:"photos/ch1-1.jpeg",cap:"queen of the boat"},{src:"photos/ch1-2.jpeg",cap:"sun in our eyes"},{src:"photos/ch1-3.jpeg",cap:"best seat on board"}],
+    bubbles:["a boat, the sea, and you…","…I had no idea you'd become my favorite person."] },
+
+  { meta:"chapter two · gym buddies",
+    colors:{bg:"#0d0c12", ink:"#ffffff", words:["#ff5fa2","#ffffff","#7de3a8"], a1:"#ff5fa2", a2:"#7de3a8", sp:"#6cc4ee",
+            bubbles:[["#6cc4ee","#0d0c12"],["#b23a8f","#ffffff"]]},
+    words:[["MIRROR","marker"],["selfie","script"],["SEASON","caps"]],
+    photos:[{src:"photos/ch2-1.jpeg",cap:"post-workout glow"},{src:"photos/ch2-2.jpeg",cap:"the orange era"},{src:"photos/ch2-3.mp4",cap:"us being us"}],
+    bubbles:["sweating together counts as bonding","every rep is easier next to you"] },
+
+  { meta:"chapter three · adventures",
+    colors:{bg:"#5ebde9", ink:"#25233f", words:["#25233f","#ffffff","#ff6b4a"], a1:"#25233f", a2:"#ffffff", sp:"#ffd36b",
+            bubbles:[["#ffffff","#25233f"],["#25233f","#ffffff"]]},
+    words:[["OUR","caps"],["little","script"],["ADVENTURES","marker"]],
+    photos:[{src:"photos/ch3-1.jpeg",cap:"night rides"},{src:"photos/ch3-2.jpeg",cap:"coffee & chaos"},{src:"photos/ch3-3.jpeg",cap:"snack break"}],
+    bubbles:["every ride, every café, every walk","became a story we still laugh about"] },
+
+  { meta:"chapter four · the silly stuff",
+    colors:{bg:"#e5484d", ink:"#ffffff", words:["#ffffff","#25233f","#ffd36b"], a1:"#25233f", a2:"#ffd36b", sp:"#7de3a8",
+            bubbles:[["#25233f","#ffffff"],["#ffffff","#e5484d"]]},
+    words:[["ALL THE","caps"],["silly","script"],["MOMENTS","marker"]],
+    photos:[{src:"photos/ch4-1.jpeg",cap:"boss mode"},{src:"photos/ch4-2.jpeg",cap:"duck faces, always"},{src:"photos/ch4-3.jpeg",cap:"flowers for you"}],
+    bubbles:["inside jokes nobody else gets","you make ordinary days feel special"] },
+
+  { meta:"chapter five · today",
+    colors:{bg:"#25233f", ink:"#ffffff", words:["#7de3a8","#ffffff","#ff5fa2"], a1:"#ff5fa2", a2:"#6cc4ee", sp:"#f3c38f",
+            bubbles:[["#ff6b4a","#ffffff"],["#6cc4ee","#25233f"]]},
+    words:[["AND NOW","marker"],["here","script"],["WE ARE","caps"]],
+    photos:[{src:"photos/ch5-1.jpeg",cap:"spooky season"},{src:"photos/ch5-2.jpeg",cap:"the squad"},{src:"photos/ch5-3.jpeg",cap:"to many more"}],
+    bubbles:["and of all the days…","today is the best one, because it's yours."] },
+];
+/* ========================================================= */
+
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText, DrawSVGPlugin, MorphSVGPlugin, Draggable, Flip);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const R = gsap.utils.random;
+
+/* ---------- morph transition shapes (normalised -1..1, scaled into a 100x100 box) ---------- */
+const SHAPES = {
+  blob:  "M0,-1 C0.55,-1.02 0.98,-0.6 0.95,-0.05 C0.92,0.5 0.6,0.95 0.02,0.92 C-0.55,0.9 -1.05,0.55 -0.98,0 C-0.92,-0.55 -0.5,-0.98 0,-1Z",
+  spark: "M0,-1 C0.18,-0.18 0.18,-0.18 1,0 C0.18,0.18 0.18,0.18 0,1 C-0.18,0.18 -0.18,0.18 -1,0 C-0.18,-0.18 -0.18,-0.18 0,-1Z",
+  heart: "M0,0.8 C-0.56,0.36 -0.92,0.06 -0.92,-0.36 C-0.92,-0.63 -0.71,-0.8 -0.46,-0.8 C-0.26,-0.8 -0.09,-0.68 0,-0.5 C0.09,-0.68 0.26,-0.8 0.46,-0.8 C0.71,-0.8 0.92,-0.63 0.92,-0.36 C0.92,0.06 0.56,0.36 0,0.8Z",
+  star:  "M0,-1 L0.24,-0.33 0.95,-0.31 0.39,0.13 0.59,0.81 0,0.4 -0.59,0.81 -0.39,0.13 -0.95,-0.31 -0.24,-0.33Z",
+};
+const COVER = "M-70,-70 L170,-70 170,170 -70,170Z";
+const shape = (name, s) => SHAPES[name].replace(/-?\d*\.?\d+/g, n => (50 + parseFloat(n) * s).toFixed(2));
+const SEQS = [["blob","spark","heart"],["heart","star","blob"],["spark","blob","heart"],["star","heart","spark"],["blob","heart","star"],["heart","spark","blob"]];
+
+// adds a morph-and-flood transition to a timeline at `pos`; returns the label time where it ends
+let morphId = 0;
+function addMorph(tl, path, seq, pos) {
+  const L = "morph" + (++morphId);
+  tl.addLabel(L, pos);
+  gsap.set(path, { attr: { d: shape(seq[0], .4) }, opacity: 0 });
+  // particle bursts: a small pop when the shape is born, a big one as it floods the screen
+  tl.call(() => burst(innerWidth / 2, innerHeight / 2, 28, 7), null, L)
+    .call(() => burst(innerWidth / 2, innerHeight / 2, 80, 16), null, L + "+=2.0");
+  tl.set(path, { opacity: 1 }, L)
+    .to(path, { morphSVG: shape(seq[0], 9),  duration: .7, ease: "back.out(1.8)" }, L)
+    .to(path, { morphSVG: { shape: shape(seq[1], 20), type: "rotational" }, duration: .7, ease: "power1.inOut" })
+    .to(path, { morphSVG: { shape: shape(seq[2], 34), type: "rotational" }, duration: .7, ease: "power1.inOut" })
+    .to(path, { morphSVG: COVER, duration: .8, ease: "power2.in" })
+    .to(path, { rotation: 140, svgOrigin: "50 50", duration: 2.9, ease: "none" }, L)
+    .to({}, { duration: .9 }); // hold on the full colour so fast scrolls still land cleanly
+}
+
+/* =========================================================
+   PARTICLES — one canvas over the whole site
+   ambient: hand-drawn sparkles / dots / hearts / rings drifting up
+   bursts:  fired by the morph transitions and the finale
+   trail:   little sparkles following the cursor / finger
+   ========================================================= */
+const cvs = document.getElementById("particles");
+const ctx = cvs.getContext("2d");
+let W = 0, H = 0, DPR = 1;
+let palette = ["#ff3b8d", "#22c9ff", "#ffffff", "#f3c38f"];
+const ambient = [], fx = [];
+const TYPES = ["dot", "spark", "heart", "ring", "dot", "spark"];
+const pick = a => a[(Math.random() * a.length) | 0];
+
+function resizeCanvas() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight;
+  cvs.width = W * DPR; cvs.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+resizeCanvas();
+addEventListener("resize", resizeCanvas);
+
+function newAmbient(p, anywhere) {
+  p.x = Math.random() * W;
+  p.y = anywhere ? Math.random() * H : H + 20;
+  p.s = R(3, 8.5);
+  p.vy = R(.15, .55);
+  p.sway = R(.4, 1.4); p.phase = R(0, 6.28); p.swaySpeed = R(.005, .015);
+  p.rot = R(0, 6.28); p.vr = R(-.01, .01);
+  p.type = pick(TYPES); p.color = pick(palette);
+  p.tw = R(0, 6.28); p.twSpeed = R(.02, .06);
+  p.depth = R(.4, 1.2);
+  return p;
+}
+const AMBIENT_COUNT = innerWidth < 760 ? 28 : 55;
+for (let k = 0; k < AMBIENT_COUNT; k++) ambient.push(newAmbient({}, true));
+
+function setPalette(cols) {
+  palette = cols;
+  ambient.forEach(p => p.color = pick(palette));
+}
+
+function burst(x, y, n = 40, speed = 10, cols) {
+  if (reduced) return;
+  const c = cols || palette.concat("#ffffff");
+  for (let k = 0; k < n; k++) {
+    const a = Math.random() * Math.PI * 2, v = R(.3, 1) * speed;
+    fx.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: .12, drag: .95,
+              s: R(3, 9), rot: R(0, 6.28), vr: R(-.2, .2), type: pick(TYPES),
+              color: pick(c), life: 0, max: R(50, 95) });
+  }
+}
+
+let lastTrail = 0;
+addEventListener("pointermove", e => {
+  if (reduced) return;
+  const now = performance.now();
+  if (now - lastTrail < 28) return;
+  lastTrail = now;
+  fx.push({ x: e.clientX, y: e.clientY, vx: R(-.8, .8), vy: R(-1.4, -.2), g: .02, drag: .97,
+            s: R(2.5, 6), rot: R(0, 6.28), vr: R(-.1, .1), type: Math.random() < .6 ? "spark" : "dot",
+            color: pick(palette), life: 0, max: R(30, 55) });
+});
+
+function drawShape(type, s) {
+  ctx.beginPath();
+  if (type === "dot") { ctx.arc(0, 0, s * .6, 0, 6.283); ctx.fill(); }
+  else if (type === "ring") { ctx.lineWidth = Math.max(1.2, s * .3); ctx.arc(0, 0, s, 0, 6.283); ctx.stroke(); }
+  else if (type === "spark") {
+    const k = s * .2;
+    ctx.moveTo(0, -s * 1.5);
+    ctx.quadraticCurveTo(k, -k, s * 1.5, 0); ctx.quadraticCurveTo(k, k, 0, s * 1.5);
+    ctx.quadraticCurveTo(-k, k, -s * 1.5, 0); ctx.quadraticCurveTo(-k, -k, 0, -s * 1.5);
+    ctx.fill();
+  } else { // heart
+    const t = s * 1.1;
+    ctx.moveTo(0, t * .9);
+    ctx.bezierCurveTo(-t * 1.3, 0, -t * .7, -t * 1.1, 0, -t * .4);
+    ctx.bezierCurveTo(t * .7, -t * 1.1, t * 1.3, 0, 0, t * .9);
+    ctx.fill();
+  }
+}
+
+function tick() {
+  ctx.clearRect(0, 0, W, H);
+  const sm = ScrollSmoother.get();
+  const vel = sm ? gsap.utils.clamp(-60, 60, sm.getVelocity() / 60) : 0; // particles lag behind fast scrolling
+
+  for (const p of ambient) {
+    p.phase += p.swaySpeed; p.tw += p.twSpeed; p.rot += p.vr;
+    p.y -= p.vy * p.depth + vel * .35 * p.depth;
+    p.x += Math.sin(p.phase) * p.sway * .3;
+    if (p.y < -30) newAmbient(p, false);
+    if (p.y > H + 40) { newAmbient(p, false); p.y = -20; }
+    ctx.save();
+    ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    ctx.globalAlpha = (.35 + .45 * (Math.sin(p.tw) * .5 + .5)) * Math.min(1, p.depth);
+    ctx.fillStyle = ctx.strokeStyle = p.color;
+    drawShape(p.type, p.s * p.depth);
+    ctx.restore();
+  }
+
+  for (let k = fx.length - 1; k >= 0; k--) {
+    const p = fx[k];
+    p.life++;
+    p.vx *= p.drag; p.vy = p.vy * p.drag + p.g;
+    p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+    const t = p.life / p.max;
+    if (t >= 1) { fx.splice(k, 1); continue; }
+    ctx.save();
+    ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    ctx.globalAlpha = 1 - t * t;
+    ctx.fillStyle = ctx.strokeStyle = p.color;
+    drawShape(p.type, p.s * (1 - t * .5));
+    ctx.restore();
+  }
+}
+if (!reduced) gsap.ticker.add(tick);
+const SPARK = "M0,-22 C4,-4 4,-4 22,0 C4,4 4,4 0,22 C-4,4 -4,4 -22,0 C-4,-4 -4,-4 0,-22Z";
+const CAMERA = '<svg viewBox="0 0 64 48"><rect x="4" y="12" width="56" height="32" rx="6"/><path d="M22 12 l4-7 h12 l4 7"/><circle cx="32" cy="28" r="9"/></svg>';
+const SPARK_POS = [[{l:"12%",t:"16%"},{l:"84%",t:"22%"},{l:"62%",t:"88%"}],[{l:"88%",t:"12%"},{l:"8%",t:"30%"},{l:"40%",t:"90%"}]];
+const SQUIG_POS = [{l:"64%",t:"30%",r:-8},{l:"10%",t:"26%",r:6}];
+
+/* ---------- STICKERS: hand-drawn, matched to what's in each photo ----------
+   STICKER_MAP: photo file name → [sticker, corner] (corners: tl, tr, bl, br) */
+const STICKER_MAP = {
+  "ch1-1": [["anchor", "tr"]],     "ch1-2": [["sunglasses", "bl"]], "ch1-3": [["sun", "tr"]],
+  "ch2-1": [["dumbbell", "br"]],   "ch2-2": [["orange", "tr"]],     "ch2-3": [["lol", "bl"]],
+  "ch3-1": [["moon", "tr"]],       "ch3-2": [["coffee", "bl"]],     "ch3-3": [["yum", "tl"]],
+  "ch4-1": [["crown", "tl"]],      "ch4-2": [["kiss", "br"]],       "ch4-3": [["sunflower", "tr"]],
+  "ch5-1": [["pumpkin", "bl"]],    "ch5-2": [["ghost", "tr"]],      "ch5-3": [["balloon", "tl"]],
+};
+const NAVY = "#25233f";
+// outlined line (navy outline + colour core), filled shape, plain stroke
+const SL = (d, c, w = 7) => `<path d="${d}" fill="none" stroke="${NAVY}" stroke-width="${w + 5}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const SF = (d, c) => `<path d="${d}" fill="${c}" stroke="${NAVY}" stroke-width="4" stroke-linejoin="round"/>`;
+const SP = (d, c, w = 3) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const ring = (cx, cy, r) => `M${cx} ${cy - r} a${r} ${r} 0 1 0 .1 0`;
+const STICKERS = {
+  anchor: SL("M50 12 a7 7 0 1 0 .1 0", "#ff6b4a") + SL("M50 26 V84", "#ff6b4a") + SL("M34 40 H66", "#ff6b4a")
+        + SL("M20 64 Q24 86 50 86 Q76 86 80 64", "#ff6b4a") + SL("M13 71 L20 62 L29 68", "#ff6b4a") + SL("M87 71 L80 62 L71 68", "#ff6b4a"),
+  sunglasses: SF("M6 36 H94 V44 H6Z", "#ff5fa2") + SF("M11 42 H45 Q45 68 28 68 Q11 68 11 42Z", NAVY) + SF("M55 42 H89 Q89 68 72 68 Q55 68 55 42Z", NAVY)
+        + SP("M18 48 L26 46", "#fff") + SP("M62 48 L70 46", "#fff"),
+  sun: Array.from({ length: 8 }, (_, k) => { const a = k * Math.PI / 4, c = Math.cos(a), s = Math.sin(a);
+          return SL(`M${50 + c * 34} ${50 + s * 34} L${50 + c * 45} ${50 + s * 45}`, "#ffd36b", 5); }).join("")
+        + SF(ring(50, 50, 26), "#ffd36b") + `<circle cx="42" cy="46" r="3.2" fill="${NAVY}"/><circle cx="58" cy="46" r="3.2" fill="${NAVY}"/>`
+        + SP("M40 56 Q50 65 60 56", NAVY) + `<circle cx="36" cy="56" r="4" fill="#ff8a8a" opacity=".7"/><circle cx="64" cy="56" r="4" fill="#ff8a8a" opacity=".7"/>`,
+  dumbbell: SL("M24 50 H76", "#cfd3ff", 6) + SF("M14 28 h12 v44 h-12z", "#6cc4ee") + SF("M74 28 h12 v44 h-12z", "#6cc4ee")
+        + SF("M5 37 h9 v26 h-9z", "#ff6b4a") + SF("M86 37 h9 v26 h-9z", "#ff6b4a"),
+  orange: SF(ring(50, 50, 40), "#ff9f43") + SF(ring(50, 50, 32), "#ffc27a")
+        + Array.from({ length: 8 }, (_, k) => { const a = k * Math.PI / 4; return SP(`M50 50 L${50 + Math.cos(a) * 31} ${50 + Math.sin(a) * 31}`, "#fff", 3); }).join("")
+        + `<circle cx="50" cy="50" r="4" fill="#fff"/>`,
+  lol: SF("M50 6 L58 22 L76 14 L72 32 L92 34 L78 48 L92 62 L72 66 L76 84 L58 76 L50 94 L42 76 L24 84 L28 66 L8 62 L22 48 L8 34 L28 32 L24 14 L42 22Z", "#ffd36b")
+        + `<text x="50" y="59" text-anchor="middle" font-family="Permanent Marker" font-size="24" fill="${NAVY}">LOL</text>`,
+  moon: SF("M60 12 A39 39 0 1 0 88 66 A31 31 0 1 1 60 12Z", "#ffd36b")
+        + `<path transform="translate(26 24) scale(.38)" d="${SPARK}" fill="#fff" stroke="${NAVY}" stroke-width="7"/>`
+        + `<path transform="translate(80 22) scale(.24)" d="${SPARK}" fill="#fff" stroke="${NAVY}" stroke-width="9"/>`,
+  coffee: SP("M40 24 q-6 -6 0 -11 q6 -5 0 -11", "#fff", 3.5) + SP("M54 24 q-6 -6 0 -11 q6 -5 0 -11", "#fff", 3.5)
+        + SL("M72 50 Q88 52 84 66 Q80 74 70 72", "#fff", 5) + SF("M24 38 H72 L66 86 Q65 90 60 90 H36 Q31 90 30 86Z", "#fff")
+        + SF("M27 54 H69 L67 70 H29Z", "#c98b5a") + SF("M19 30 H77 V39 H19Z", "#7a4a2a"),
+  yum: SF("M14 20 H86 Q92 20 92 26 V60 Q92 66 86 66 H44 L28 84 L32 66 H14 Q8 66 8 60 V26 Q8 20 14 20Z", "#ff5fa2")
+        + `<text x="50" y="53" text-anchor="middle" font-family="Permanent Marker" font-size="24" fill="#fff">YUM!</text>`,
+  crown: SF("M14 72 L8 28 L32 48 L50 16 L68 48 L92 28 L86 72Z", "#ffd36b") + SF("M14 72 H86 V86 H14Z", "#ffb02e")
+        + `<circle cx="32" cy="79" r="4" fill="#ff5fa2" stroke="${NAVY}" stroke-width="2"/><circle cx="50" cy="79" r="4" fill="#6cc4ee" stroke="${NAVY}" stroke-width="2"/><circle cx="68" cy="79" r="4" fill="#7de3a8" stroke="${NAVY}" stroke-width="2"/>`,
+  kiss: SF("M8 50 Q24 28 40 37 Q50 29 60 37 Q76 28 92 50 Q72 78 50 78 Q28 78 8 50Z", "#e5484d")
+        + SP("M13 50 Q50 59 87 50", NAVY, 3) + SP("M28 43 Q34 38 40 41", "#fff", 3.5) + SP("M40 66 Q50 70 58 67", "#fff", 3),
+  sunflower: Array.from({ length: 12 }, (_, k) => `<ellipse cx="50" cy="21" rx="9" ry="17" fill="#ffd36b" stroke="${NAVY}" stroke-width="3" transform="rotate(${k * 30} 50 50)"/>`).join("")
+        + SF(ring(50, 50, 17), "#7a4a2a") + `<circle cx="45" cy="46" r="2" fill="#c98b5a"/><circle cx="55" cy="48" r="2" fill="#c98b5a"/><circle cx="49" cy="56" r="2" fill="#c98b5a"/>`,
+  pumpkin: SF("M46 30 L44 12 Q50 8 56 12 L54 30Z", "#5aa86a") + SF("M50 28 C20 26 8 50 13 66 C18 86 40 90 50 84 C60 90 82 86 87 66 C92 50 80 26 50 28Z", "#ff8a3d")
+        + SP("M50 30 Q42 58 50 84", NAVY) + SP("M50 30 Q58 58 50 84", NAVY)
+        + `<path d="M28 50 L38 50 L33 42Z M62 50 L72 50 L67 42Z M28 64 L36 70 L42 64 L50 70 L58 64 L64 70 L72 64 L66 74 L34 74Z" fill="${NAVY}"/>`,
+  ghost: SF("M22 88 V44 Q22 12 50 12 Q78 12 78 44 V88 L68 80 L59 88 L50 80 L41 88 L32 80Z", "#fff")
+        + `<ellipse cx="40" cy="44" rx="4.5" ry="6.5" fill="${NAVY}"/><ellipse cx="60" cy="44" rx="4.5" ry="6.5" fill="${NAVY}"/><ellipse cx="50" cy="60" rx="5" ry="6" fill="${NAVY}"/>`
+        + `<circle cx="32" cy="54" r="4" fill="#ff8a8a" opacity=".7"/><circle cx="68" cy="54" r="4" fill="#ff8a8a" opacity=".7"/>`,
+  balloon: SL("M50 74 Q40 84 52 96", "#fff", 2.5) + SF("M50 8 C73 8 83 30 79 46 C75 62 61 72 50 72 C39 72 25 62 21 46 C17 30 27 8 50 8Z", "#e5484d")
+        + SF("M45 72 L55 72 L50 78Z", "#e5484d") + SP("M33 24 Q28 33 30 42", "#fff", 4.5),
+};
+function stickerHTML(src) {
+  const key = src.split("/").pop().replace(/\.\w+$/, "");
+  return (STICKER_MAP[key] || []).map(([name, corner]) => {
+    const r = (corner === "tl" || corner === "br" ? -1 : 1) * (8 + Math.random() * 10);
+    return `<svg class="sticker ${corner}" viewBox="0 0 100 100" style="transform:rotate(${r.toFixed(1)}deg)" aria-hidden="true">${STICKERS[name] || ""}</svg>`;
+  }).join("");
+}
+
+/* the tic tac toe game sits after this chapter (0-based: 2 = after chapter three) */
+const GAME_AFTER = 2;
+const GAME_BG = "#25233f";
+
+/* the photo-sorting game sits after this chapter (3 = after chapter four).
+   List the 4 photos in the CORRECT order, oldest first — they get shuffled on screen. */
+const SORT_AFTER = 3;
+const SORT_BG = "#1b1930";
+const SORT_PHOTOS = [
+  { src: "photos/ch1-1.jpeg", cap: "the boat" },
+  { src: "photos/ch2-1.jpeg", cap: "gym days" },
+  { src: "photos/ch3-1.jpeg", cap: "night rides" },
+  { src: "photos/ch5-1.jpeg", cap: "halloween" },
+];
+
+/* ---------- build chapters ---------- */
+const host = document.getElementById("chapters");
+CHAPTERS.forEach((ch, i) => {
+  const c = ch.colors;
+  const next = i === GAME_AFTER ? GAME_BG : i === SORT_AFTER ? SORT_BG : i < CHAPTERS.length - 1 ? CHAPTERS[i+1].colors.bg : "#0b0a10";
+  const s = document.createElement("section");
+  s.className = "scene chapter";
+  s.style.cssText = `--bg:${c.bg};--ink:${c.ink};--a1:${c.a1};--a2:${c.a2};--sp:${c.sp};--next:${next}`;
+
+  let rays = "";
+  for (let k = 0; k < 22; k++) {
+    const a = (k / 22) * Math.PI * 2, j = R(0.92, 1.08);
+    rays += `<line x1="${(Math.cos(a)*250*j).toFixed(1)}" y1="${(Math.sin(a)*125*j).toFixed(1)}" x2="${(Math.cos(a)*292*j).toFixed(1)}" y2="${(Math.sin(a)*146*j).toFixed(1)}"/>`;
+  }
+  const words = ch.words.map(([t,f],k) => `<span class="w ${f}" style="color:${c.words[k % c.words.length]}">${t}</span>`).join("");
+  const photos = ch.photos.map((p,k) => `
+    <figure class="pol p${k}">
+      <div class="img">${/\.(mp4|webm|mov)$/i.test(p.src)
+        ? `<video src="${p.src}" muted autoplay loop playsinline preload="auto" aria-label="${p.cap}"></video>`
+        : `<img alt="${p.cap}" data-src="${p.src}" data-n="${i+1}-${k+1}">`}</div>
+      <figcaption>${p.cap}</figcaption>${stickerHTML(p.src)}
+    </figure>`).join("");
+  const bubbles = ch.bubbles.map((b,k) => `<div class="bubble b${k}" style="--bb:${c.bubbles[k][0]};--bf:${c.bubbles[k][1]}"><p>${b}</p></div>`).join("");
+  const sp = SPARK_POS[i % 2].map(p => `<svg class="spark" viewBox="-26 -26 52 52" style="left:${p.l};top:${p.t}"><path d="${SPARK}"/></svg>`).join("");
+  const q = SQUIG_POS[i % 2];
+  const squig = `<svg class="squig" viewBox="0 0 220 40" style="left:${q.l};top:${q.t};transform:rotate(${q.r}deg)"><path d="M6,20 Q30,0 54,20 T102,20 T150,20 T198,20"/></svg>`;
+
+  s.innerHTML = `
+    <div class="stage">
+      <div class="meta">${ch.meta}</div>
+      <div class="title-wrap"><h2 class="title">
+        <svg class="rays" viewBox="-300 -150 600 300" preserveAspectRatio="none">${rays}</svg>${words}
+      </h2></div>
+      ${squig}${photos}${sp}${bubbles}
+    </div>
+    <svg class="morph" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><path/></svg>`;
+  host.appendChild(s);
+});
+
+/* ---------- build the game section ---------- */
+const nextAfterGame = CHAPTERS[GAME_AFTER + 1] ? CHAPTERS[GAME_AFTER + 1].colors.bg : "#0b0a10";
+const game = document.createElement("section");
+game.className = "scene game";
+game.id = "game";
+game.style.cssText = `--bg:${GAME_BG};--next:${nextAfterGame}`;
+game.innerHTML = `
+  <div class="stage">
+    <h2 class="title">
+      <span class="w caps" style="color:#7de3a8">BUT FIRST</span><span class="w script" style="color:#fff">let's</span><span class="w marker" style="color:#ff6b4a">PLAY</span>
+    </h2>
+    <p class="hint">beat me at tic tac toe to keep going ;)</p>
+    <div class="board">
+      <svg viewBox="0 0 300 300" aria-hidden="true">
+        <g class="grid">
+          <path d="M101,12 C97,90 104,200 99,288"/><path d="M199,10 C203,110 196,190 201,290"/>
+          <path d="M12,99 C90,104 200,96 288,101"/><path d="M10,201 C110,197 190,204 290,199"/>
+        </g>
+        <g class="marks"></g>
+        <path class="strike" d=""/>
+      </svg>
+      <div class="cells" role="grid" aria-label="tic tac toe board">
+        ${Array.from({length:9}, (_, k) => `<button type="button" data-k="${k}" aria-label="square ${k+1}"></button>`).join("")}
+      </div>
+    </div>
+  </div>
+  <div class="win-msg" aria-live="polite">
+    <div class="card">
+      <span class="w caps">I KNOW</span><span class="w script">you will</span><span class="w marker">always</span><span class="w caps">WIN</span>
+    </div>
+  </div>
+  <svg class="morph" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><path/></svg>`;
+host.children[GAME_AFTER].after(game);
+
+/* ---------- build the sort-the-photos section ---------- */
+const nextAfterSort = CHAPTERS[SORT_AFTER + 1] ? CHAPTERS[SORT_AFTER + 1].colors.bg : "#0b0a10";
+const sortSec = document.createElement("section");
+sortSec.className = "scene game sortgame";
+sortSec.id = "sortgame";
+sortSec.style.cssText = `--bg:${SORT_BG};--next:${nextAfterSort}`;
+const SHADOWS = ["#ff6b4a", "#6cc4ee", "#7de3a8", "#ff5fa2"];
+const LABELS = ["1 · oldest", "2", "3", "4 · newest"];
+sortSec.innerHTML = `
+  <div class="stage">
+    <h2 class="title">
+      <span class="w caps" style="color:#ffd36b">WHICH CAME</span><span class="w script" style="color:#fff">first?</span>
+    </h2>
+    <p class="hint"></p>
+    <div class="slots">
+      ${LABELS.map((l, k) => `<div class="slot" data-slot="${k}"><div class="well"></div><span class="num">${l}</span></div>`).join("")}
+    </div>
+  </div>
+  <div class="win-msg" aria-live="polite">
+    <div class="card" style="background:#7de3a8">
+      <span class="w script" style="color:#25233f">you</span><span class="w caps" style="color:#fff">REMEMBER</span><span class="w script" style="color:#25233f">every</span><span class="w marker" style="color:#ff5fa2">MOMENT</span>
+    </div>
+  </div>
+  <svg class="morph" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><path/></svg>`;
+document.querySelectorAll("#chapters .chapter")[SORT_AFTER].after(sortSec);
+
+// shuffle (never already in the right order)
+let order;
+do { order = gsap.utils.shuffle([0, 1, 2, 3]); } while (order.every((v, k) => v === k));
+const wells = sortSec.querySelectorAll(".well");
+order.forEach((pi, slot) => {
+  const p = SORT_PHOTOS[pi];
+  const name = p.src.split("/").pop().replace(/\.\w+$/, "");
+  wells[slot].innerHTML = `
+    <figure class="scard" data-i="${pi}" style="--sc:${SHADOWS[pi]}">
+      <div class="img"><img alt="${p.cap}" data-src="${p.src}" data-n="${name}" draggable="false"></div>
+      <figcaption>${p.cap}</figcaption>${stickerHTML(p.src)}
+    </figure>`;
+});
+
+/* photos: load if present, otherwise placeholder */
+document.querySelectorAll(".pol img, .scard img").forEach(img => {
+  img.onerror = () => {
+    const box = img.parentElement;
+    box.classList.add("ph");
+    box.innerHTML = `<div class="lbl">${CAMERA}<span>photo ${img.dataset.n}</span></div>`;
+  };
+  img.src = img.dataset.src;
+});
+
+document.querySelector(".finale .name").textContent = NAME;
+document.querySelector(".finale .sign").textContent = SIGNATURE;
+
+/* ---------- smooth scroll ---------- */
+if (!reduced) ScrollSmoother.create({ wrapper:"#smooth-wrapper", content:"#smooth-content", smooth:1.15, smoothTouch:0.1 });
+if ("scrollRestoration" in history) history.scrollRestoration = "manual"; // ScrollSmoother turns restoration back on
+
+/* ---------- neon helpers ---------- */
+function flickerOn(el, at = 0) {
+  const tl = gsap.timeline({ delay: at });
+  [0, .07, .12, .21, .27, .52, .58].forEach((t, k) => tl.call(() => el.classList.toggle("on", k % 2 === 0), null, t));
+  return tl.call(() => el.classList.add("on"), null, .66);
+}
+function buzz(el) {
+  if (reduced) return;
+  gsap.delayedCall(R(2.5, 7), () => {
+    el.classList.remove("on");
+    gsap.delayedCall(.06, () => { el.classList.add("on"); buzz(el); });
+  });
+}
+
+/* ---------- intro ---------- */
+const n1 = document.querySelector(".intro .n1"), n2 = document.querySelector(".intro .n2");
+const introSub = new SplitText(".intro .sub", { type: "chars" });
+gsap.set(introSub.chars, { autoAlpha: 0 });
+gsap.timeline({ delay: .5 })
+  .add(flickerOn(n1), 0)
+  .add(flickerOn(n2), .55)
+  .call(() => { buzz(n1); buzz(n2); }, null, 1.4)
+  .to(introSub.chars, { autoAlpha: 1, duration: .01, stagger: .045 }, 1.4)
+  .from(".chev", { autoAlpha: 0, duration: .4 }, ">");
+gsap.to(".chev polyline", { opacity: .15, duration: .35, stagger: { each: .18, repeat: -1, yoyo: true }, ease: "steps(1)" });
+
+const introTl = gsap.timeline({ scrollTrigger: { trigger: "#intro", start: "top top", end: "+=170%", scrub: .6, pin: true, anticipatePin: 1 } })
+  .to(".intro .stage", { scale: 1.25, autoAlpha: .4, ease: "power2.in", duration: 2.9 }, 0);
+addMorph(introTl, document.querySelector(".intro .morph path"), ["heart","spark","blob"], 0);
+
+/* ---------- chapters ---------- */
+const chapterST = [];
+gsap.utils.toArray(".chapter").forEach((s, i) => {
+  const q = gsap.utils.selector(s);
+  const pols = q(".pol"), bubbles = q(".bubble");
+  const split = new SplitText(q(".bubble p"), { type: "words" });
+
+  const tl = gsap.timeline({
+    defaults: { ease: "power2.out" },
+    scrollTrigger: { trigger: s, start: "top top", end: () => "+=" + innerHeight * 3.8, scrub: .6, invalidateOnRefresh: true,
+                     onToggle: self => { if (self.isActive) { const c = CHAPTERS[i].colors; setPalette([...c.words, c.sp, c.a1, c.a2]); } }, pin: true, anticipatePin: 1 }
+  });
+
+  tl.from(q(".meta"), { y: 30, autoAlpha: 0, duration: .6 })
+    .from(q(".w"), { scale: 0, y: 90, rotation: () => R(-28, 28), autoAlpha: 0, ease: "back.out(2.4)", duration: 1, stagger: .35 }, "<.2")
+    .from(q(".rays line"), { drawSVG: "50% 50%", duration: .5, stagger: .025 }, "-=.7")
+    .from(pols, { y: () => innerHeight * 1.05, rotation: k => [-34, 22, 38][k], ease: "power3.out", duration: 1.4, stagger: .4 }, "-=.3")
+    .to(pols, { rotation: k => [-7, 3, 8][k], duration: 1.4, stagger: .4 }, "<")
+    // stickers get slapped on after each photo lands
+    .from(q(".pol .sticker"), { scale: 2.6, autoAlpha: 0, rotation: "+=35", ease: "back.out(2.2)", duration: .45, stagger: .4 }, "<.9")
+    .from(q(".squig path"), { drawSVG: "0%", duration: 1 }, "<.3")
+    .from(q(".spark"), { scale: 0, rotation: -200, ease: "back.out(3)", duration: .6, stagger: .2 }, "<.3")
+    .from(bubbles, { scale: 0, transformOrigin: k => k ? "85% 110%" : "15% 110%", ease: "back.out(2)", duration: .8, stagger: .9 }, "-=.4")
+    .from(split.words, { y: 14, autoAlpha: 0, duration: .25, stagger: .07 }, "<.25")
+    .to({}, { duration: 1.2 })
+    .addLabel("out")
+    // photos get pulled into the centre where the shape is born
+    .to(pols, { x: (k, el) => innerWidth / 2 - (el.offsetLeft + el.offsetWidth / 2),
+                y: (k, el) => innerHeight * .5 - (el.offsetTop + el.offsetHeight / 2),
+                scale: .15, rotation: k => [-120, 90, 160][k], autoAlpha: 0,
+                ease: "power2.in", duration: 1.1, stagger: .08 }, "out")
+    .to([q(".title-wrap"), q(".meta"), q(".squig"), bubbles], { scale: .6, autoAlpha: 0, ease: "power2.in", duration: .9 }, "out+=.1")
+    .to(q(".spark"), { scale: 0, rotation: "+=180", duration: .8, ease: "back.in(2)" }, "out");
+  addMorph(tl, q(".morph path")[0], SEQS[i % SEQS.length], "out+=.35");
+  chapterST[i] = tl.scrollTrigger;
+});
+
+/* =========================================================
+   GATES — the games block the page until they're won.
+   A guard runs every frame: if the page is ever at or past an unfinished
+   game (fast fling, scrollbar drag, keyboard, reload mid-page…), it snaps
+   back onto that game and freezes scrolling until releaseGate() is called.
+   ========================================================= */
+const gates = [];
+let activeGate = null;
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+scrollTo(0, 0); // the story always starts from the intro
+addEventListener("beforeunload", () => scrollTo(0, 0)); // …even after a reload
+
+function makeGate(section, pal) {
+  const g = { st: ScrollTrigger.create({ trigger: section, start: "top top" }), pal, done: false };
+  gates.push(g);
+  return g;
+}
+const scrollPos = () => { const sm = ScrollSmoother.get(); return sm ? sm.scrollTop() : scrollY; };
+function snapTo(y) {
+  const sm = ScrollSmoother.get();
+  if (sm) { sm.paused(false); sm.scrollTo(y, false); sm.paused(true); } else scrollTo(0, y);
+}
+function engageGate(g) {
+  activeGate = g;
+  setPalette(g.pal);
+  document.documentElement.classList.add("locked");
+  const sm = ScrollSmoother.get();
+  if (sm) hardLock(sm, g.st.start); else scrollTo(0, g.st.start);
+}
+function releaseGate(g) {
+  g.done = true;
+  activeGate = null;
+  document.documentElement.classList.remove("locked");
+  const sm = ScrollSmoother.get();
+  if (sm) sm.paused(false);
+}
+// before ScrollTrigger's first full measure every start reads 0, so the guard waits for it
+let guardReady = false;
+ScrollTrigger.addEventListener("refresh", () => {
+  if (!guardReady) { // first measure: make sure a reload also starts at the intro
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    const sm = ScrollSmoother.get();
+    sm ? sm.scrollTo(0, false) : scrollTo(0, 0);
+  }
+  guardReady = true;
+});
+gsap.ticker.add(() => {
+  if (!guardReady) return;
+  const y = scrollPos();
+  if (!activeGate) {
+    const g = gates.find(g => !g.done && g.st.start > 10 && y >= g.st.start - 1);
+    if (g) engageGate(g);
+  } else if (Math.abs(y - activeGate.st.start) > 1) {
+    snapTo(activeGate.st.start);
+  }
+});
+// swallow every scroll input while a game is active
+const stop = e => { if (activeGate) e.preventDefault(); };
+addEventListener("wheel", stop, { passive: false });
+addEventListener("touchmove", e => { if (activeGate && !e.target.closest(".scard")) e.preventDefault(); }, { passive: false });
+addEventListener("keydown", e => {
+  if (!activeGate) return;
+  const keys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End"];
+  if (keys.includes(e.key) || (e.key === " " && !e.target.closest("button"))) e.preventDefault();
+});
+
+// snap exactly onto a game section and freeze scrolling (re-applied for a few frames so smoothing can't drift past it)
+function hardLock(sm, y) {
+  let n = 0;
+  gsap.killTweensOf(sm);
+  (function hold() {
+    sm.paused(false);
+    sm.scrollTo(y, false);
+    sm.paused(true);
+    if (++n < 15) requestAnimationFrame(hold);
+  })();
+}
+
+/* ---------- tic tac toe (easy mode: the computer never wins and never blocks) ---------- */
+(() => {
+  const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const q = gsap.utils.selector(game);
+  const marks = q(".marks")[0], strike = q(".strike")[0], hint = q(".hint")[0];
+  const cells = q(".cells button"), winMsg = q(".win-msg")[0], morphPath = q(".morph path")[0];
+  const board = Array(9).fill(null);
+  let busy = false, done = false;
+  const HINT = "beat me at tic tac toe to keep going ;)";
+  const NS = "http://www.w3.org/2000/svg";
+  const center = k => [50 + (k % 3) * 100, 50 + ((k / 3) | 0) * 100];
+  const winner = (b, p) => LINES.find(l => l.every(k => b[k] === p)) || null;
+  const empties = () => board.map((v, k) => v ? -1 : k).filter(k => k >= 0);
+
+  function drawMark(k, p) {
+    board[k] = p;
+    cells[k].disabled = true;
+    cells[k].setAttribute("aria-label", `square ${k + 1}: ${p === "X" ? "you" : "me"}`);
+    const [cx, cy] = center(k);
+    const paths = p === "X"
+      ? [`M${cx-28},${cy-27} Q${cx},${cy+3} ${cx+27},${cy+28}`, `M${cx+27},${cy-28} Q${cx+2},${cy-1} ${cx-28},${cy+27}`]
+      : [`M${cx},${cy-30} a30,30 0 1,1 -0.1,0`];
+    const els = paths.map(d => {
+      const el = document.createElementNS(NS, "path");
+      el.setAttribute("d", d); el.setAttribute("class", p.toLowerCase());
+      marks.appendChild(el); return el;
+    });
+    gsap.from(els, { drawSVG: "0%", duration: .35, stagger: .15, ease: "power2.out" });
+    const r = cells[k].getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, 10, 5, p === "X" ? ["#ff6b4a", "#fff"] : ["#6cc4ee", "#fff"]);
+  }
+
+  function aiMove() {
+    const free = empties();
+    const safe = free.filter(k => { board[k] = "O"; const w = winner(board, "O"); board[k] = null; return !w; });
+    const noBlock = safe.filter(k => { board[k] = "X"; const w = winner(board, "X"); board[k] = null; return !w; });
+    const pool = noBlock.length ? noBlock : safe;
+    if (pool.length) drawMark(pick(pool), "O");
+  }
+
+  function resetBoard(msg) {
+    hint.textContent = msg;
+    gsap.to(marks.children, { autoAlpha: 0, scale: .5, transformOrigin: "50% 50%", duration: .35, stagger: .03,
+      onComplete: () => {
+        marks.innerHTML = "";
+        board.fill(null);
+        cells.forEach((c, k) => { c.disabled = false; c.setAttribute("aria-label", `square ${k + 1}`); });
+        busy = false;
+        gsap.delayedCall(1, () => { if (!done) hint.textContent = HINT; });
+      } });
+  }
+
+  function onWin(line) {
+    done = true; busy = true;
+    cells.forEach(c => c.disabled = true);
+    hint.textContent = "";
+    const [x1, y1] = center(line[0]), [x2, y2] = center(line[2]);
+    const dx = (x2 - x1) * .18, dy = (y2 - y1) * .18;
+    strike.setAttribute("d", `M${x1 - dx},${y1 - dy} L${x2 + dx},${y2 + dy}`);
+    line.forEach((k, n) => gsap.delayedCall(.15 * n, () => {
+      const r = cells[k].getBoundingClientRect();
+      burst(r.left + r.width / 2, r.top + r.height / 2, 30, 10, ["#7de3a8", "#ffd36b", "#ff5fa2", "#fff"]);
+    }));
+
+    const tl = gsap.timeline({ onComplete: goNext });
+    tl.fromTo(strike, { drawSVG: "0%", opacity: 1 }, { drawSVG: "100%", duration: .5, ease: "power2.out" })
+      .set(winMsg, { visibility: "visible" }, "+=.3")
+      .from(q(".win-msg .card"), { scale: 0, rotation: -12, ease: "back.out(2)", duration: .6 })
+      .from(q(".win-msg .w"), { scale: 0, y: 50, rotation: () => R(-25, 25), autoAlpha: 0, ease: "back.out(2.4)", duration: .5, stagger: .18 }, "<.2")
+      .call(() => burst(innerWidth / 2, innerHeight / 2, 110, 17, ["#ff5fa2", "#ffd36b", "#7de3a8", "#6cc4ee", "#fff"]))
+      .to({}, { duration: 2.2 })
+      .to(winMsg, { autoAlpha: 0, scale: .8, duration: .4, ease: "power2.in" });
+    addMorph(tl, morphPath, ["heart", "spark", "blob"], ">");
+  }
+
+  function goNext() {
+    releaseGate(gate);
+    const sm = ScrollSmoother.get();
+    const target = chapterST[GAME_AFTER + 1] ? chapterST[GAME_AFTER + 1].start
+                 : (sm ? sm.offset("#finale", "top top") : document.getElementById("finale").offsetTop);
+    if (sm) sm.scrollTo(target, false); else scrollTo(0, target);
+    gsap.delayedCall(.3, () => gsap.set(morphPath, { opacity: 0 }));
+  }
+
+  cells.forEach(c => c.addEventListener("click", () => {
+    const k = +c.dataset.k;
+    if (busy || done || board[k]) return;
+    drawMark(k, "X");
+    const w = winner(board, "X");
+    if (w) return onWin(w);
+    if (!empties().length) { busy = true; return resetBoard("a draw?! one more time…"); }
+    busy = true;
+    gsap.delayedCall(.55, () => {
+      aiMove();
+      if (!empties().length) return resetBoard("a draw?! one more time…");
+      busy = false;
+    });
+  }));
+
+  // entrance + scroll lock until the game is won
+  gsap.timeline({ scrollTrigger: { trigger: game, start: "top 65%", toggleActions: "play none none none" } })
+    .from(q(".title .w"), { scale: 0, y: 70, rotation: () => R(-25, 25), autoAlpha: 0, ease: "back.out(2.4)", duration: .6, stagger: .15 })
+    .from(q(".grid path"), { drawSVG: "0%", duration: .5, stagger: .12 }, "-=.2")
+    .from(hint, { autoAlpha: 0, y: 12, duration: .4 });
+  const gate = makeGate(game, ["#ff6b4a", "#6cc4ee", "#7de3a8", "#ff5fa2", "#ffffff"]);
+})();
+
+/* ---------- sort the photos: drag (or tap two) to put them oldest → newest ---------- */
+(() => {
+  const q = gsap.utils.selector(sortSec);
+  const wells = q(".well"), slots = q(".slot"), hint = q(".hint")[0];
+  const winMsg = q(".win-msg")[0], morphPath = q(".morph path")[0];
+  const HINT = "drag the photos (or tap two to swap) — oldest → newest";
+  let done = false, sel = null;
+  hint.textContent = HINT;
+
+  const cardIn = w => w.querySelector(".scard");
+  const center = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+
+  function swap(a, wellB) {
+    const b = cardIn(wellB), wellA = a.parentElement;
+    if (!b || wellA === wellB) return;
+    const state = Flip.getState([a, b]);
+    gsap.set([a, b], { x: 0, y: 0 });
+    wellB.appendChild(a); wellA.appendChild(b);
+    Flip.from(state, { duration: .5, ease: "back.out(1.5)", zIndex: 5 });
+    const [x, y] = center(wellB);
+    burst(x, y, 12, 6, ["#f3c38f", "#fff"]);
+    check();
+  }
+
+  function check() {
+    const good = wells.map((w, k) => +cardIn(w).dataset.i === k);
+    good.forEach((g, k) => slots[k].classList.toggle("good", g));
+    const n = good.filter(Boolean).length;
+    if (n === 4) return win();
+    hint.textContent = n ? `${n} of 4 in the right spot…` : HINT;
+  }
+
+  function clearSel() { if (sel) sel.classList.remove("sel"); sel = null; }
+
+  const drags = Draggable.create(q(".scard"), {
+    type: "x,y",
+    zIndexBoost: true,
+    onPress() { gsap.to(this.target, { scale: 1.06, rotation: R(-4, 4), duration: .2 }); },
+    onRelease() { gsap.to(this.target, { scale: 1, rotation: 0, duration: .3 }); },
+    onDrag() {
+      clearSel();
+      slots.forEach((s, k) => s.classList.toggle("hot", wells[k] !== this.target.parentElement && this.hitTest(wells[k], "35%")));
+    },
+    onDragEnd() {
+      slots.forEach(s => s.classList.remove("hot"));
+      const target = wells.find(w => w !== this.target.parentElement && this.hitTest(w, "35%"));
+      if (target && !done) swap(this.target, target);
+      else gsap.to(this.target, { x: 0, y: 0, duration: .45, ease: "back.out(2)" });
+    },
+    onClick() {
+      if (done) return;
+      const c = this.target;
+      if (!sel) { sel = c; c.classList.add("sel"); }
+      else if (sel === c) clearSel();
+      else { const a = sel; clearSel(); swap(a, c.parentElement); }
+    },
+  });
+
+  function win() {
+    done = true;
+    drags.forEach(d => d.disable());
+    hint.textContent = "";
+    const tl = gsap.timeline({ delay: .5, onComplete: goNext });
+    q(".scard").forEach((c, k) => tl.call(() => { const [x, y] = center(c); burst(x, y, 26, 10, [SHADOWS[k], "#fff", "#ffd36b"]); }, null, k * .15)
+                                    .to(c, { y: -18, duration: .15, yoyo: true, repeat: 1, ease: "power1.out" }, k * .15));
+    tl.set(winMsg, { visibility: "visible" }, "+=.4")
+      .from(q(".win-msg .card"), { scale: 0, rotation: 10, ease: "back.out(2)", duration: .6 })
+      .from(q(".win-msg .w"), { scale: 0, y: 50, rotation: () => R(-25, 25), autoAlpha: 0, ease: "back.out(2.4)", duration: .5, stagger: .18 }, "<.2")
+      .call(() => burst(innerWidth / 2, innerHeight / 2, 110, 17, SHADOWS.concat("#fff", "#ffd36b")))
+      .to({}, { duration: 2.2 })
+      .to(winMsg, { autoAlpha: 0, scale: .8, duration: .4, ease: "power2.in" });
+    addMorph(tl, morphPath, ["blob", "heart", "star"], ">");
+  }
+
+  function goNext() {
+    releaseGate(gate);
+    const sm = ScrollSmoother.get();
+    const target = chapterST[SORT_AFTER + 1] ? chapterST[SORT_AFTER + 1].start
+                 : (sm ? sm.offset("#finale", "top top") : document.getElementById("finale").offsetTop);
+    if (sm) sm.scrollTo(target, false); else scrollTo(0, target);
+    gsap.delayedCall(.3, () => gsap.set(morphPath, { opacity: 0 }));
+  }
+
+  gsap.timeline({ scrollTrigger: { trigger: sortSec, start: "top 65%", toggleActions: "play none none none" } })
+    .from(q(".title .w"), { scale: 0, y: 70, rotation: () => R(-25, 25), autoAlpha: 0, ease: "back.out(2.4)", duration: .6, stagger: .15 })
+    .from(q(".slot"), { y: 80, autoAlpha: 0, rotation: () => R(-10, 10), ease: "back.out(1.8)", duration: .55, stagger: .1 }, "-=.2")
+    .from(q(".sticker"), { scale: 2.4, autoAlpha: 0, rotation: "+=35", ease: "back.out(2.2)", duration: .4, stagger: .1 }, "-=.2")
+    .from(hint, { autoAlpha: 0, y: 12, duration: .4 });
+  const gate = makeGate(sortSec, SHADOWS.concat("#ffffff", "#ffd36b"));
+})();
+
+/* ---------- finale ---------- */
+const heart = document.querySelector(".heart");
+const nameSplit = new SplitText(".finale .name", { type: "chars" });
+const conf = document.querySelector(".confetti");
+const COLORS = ["#ff6b4a","#6cc4ee","#7de3a8","#ff5fa2","#f3c38f","#ffd36b"];
+for (let k = 0; k < 36; k++) {
+  const d = document.createElement("div");
+  const shape = k % 3;
+  d.style.cssText = "position:absolute;left:0;top:0";
+  d.innerHTML = shape === 0
+    ? `<svg width="26" height="26" viewBox="-26 -26 52 52"><path d="${SPARK}" fill="${COLORS[k%6]}"/></svg>`
+    : shape === 1
+      ? `<div style="width:12px;height:12px;border-radius:50%;background:${COLORS[k%6]}"></div>`
+      : `<svg width="40" height="16" viewBox="0 0 40 16"><path d="M2,8 Q10,0 18,8 T34,8" fill="none" stroke="${COLORS[k%6]}" stroke-width="4" stroke-linecap="round"/></svg>`;
+  conf.appendChild(d);
+}
+gsap.set(conf.children, { scale: 0, xPercent: -50, yPercent: -50 });
+gsap.set(nameSplit.chars, { display: "inline-block" });
+
+gsap.timeline({ scrollTrigger: { trigger: "#finale", start: "top 55%", toggleActions: "play none none none" } })
+  .from(".heart path", { drawSVG: "0%", duration: 2.2, ease: "power1.inOut" })
+  .add(() => flickerOn(heart), "-=.2")
+  .add(flickerOn(document.querySelector(".f1")), "+=.3")
+  .add(flickerOn(document.querySelector(".f2")), "+=.35")
+  .from(nameSplit.chars, { y: 60, scale: 0, rotation: () => R(-30, 30), autoAlpha: 0, ease: "back.out(2.6)", duration: .7, stagger: .06 }, "+=.5")
+  .to(conf.children, {
+      scale: () => R(.7, 1.3), x: () => R(-0.48, 0.48) * innerWidth, y: () => R(-0.45, 0.45) * innerHeight,
+      rotation: () => R(-260, 260), duration: 1.6, ease: "expo.out", stagger: .01 }, "<.2")
+  .from(".finale .sign", { y: 20, autoAlpha: 0, duration: .8 }, "-=1")
+  .call(() => {
+    buzz(document.querySelector(".f1")); buzz(document.querySelector(".f2"));
+    if (!reduced) gsap.to(conf.children, { y: "+=" + 18, rotation: "+=25", duration: () => R(2, 4), yoyo: true, repeat: -1, ease: "sine.inOut" });
+  });
+
+/* intro palette when scrolling back to the top, finale palette + fireworks at the end */
+ScrollTrigger.create({ trigger: "#intro", start: "top top", end: "bottom top",
+  onEnterBack: () => setPalette(["#ff3b8d", "#22c9ff", "#ffffff", "#f3c38f"]) });
+let fireworks = null;
+ScrollTrigger.create({ trigger: "#finale", start: "top 55%",
+  onEnter: () => {
+    setPalette(COLORS);
+    if (reduced || fireworks) return;
+    burst(innerWidth / 2, innerHeight / 2, 120, 18, COLORS);
+    fireworks = gsap.delayedCall(1.4, function pop() {
+      burst(R(.15, .85) * innerWidth, R(.15, .6) * innerHeight, 45, 9, COLORS);
+      fireworks = gsap.delayedCall(R(1, 2.2), pop);
+    });
+  },
+  onLeaveBack: () => {
+    if (fireworks) { fireworks.kill(); fireworks = null; }
+    const c = CHAPTERS[CHAPTERS.length - 1].colors; setPalette([...c.words, c.sp]);
+  } });
+
+/* ---------- MUSIC: "Count on Me" — put the file at music/count-on-me.mp3 ----------
+   Browsers block sound until the visitor interacts, so it starts on the first tap / click / key press.
+   MUSIC_START = second to start from. 0 = "If you ever find yourself stuck in the middle of the sea…",
+   which lands on chapter one (the boat trip).
+   FINALE_AT = when the finale opens, the song jumps to the last chorus
+   (2:34 "You know you can count on me like one, two, three…"). */
+(() => {
+  const MUSIC_START = 0, FINALE_AT = 154, MUSIC_VOLUME = .7;
+  const song = document.getElementById("song");
+  const btn = document.querySelector(".music"), hint = document.querySelector(".music-hint");
+  const spin = gsap.to(".music .disc", { rotation: 360, svgOrigin: "50 50", duration: 3.2, ease: "none", repeat: -1, paused: true });
+  let started = false, available = true;
+
+  function setPlaying(on) {
+    btn.classList.toggle("playing", on);
+    btn.setAttribute("aria-pressed", on);
+    btn.setAttribute("aria-label", on ? "pause music" : "play music");
+    on ? spin.play() : spin.pause();
+  }
+  function play() {
+    if (!available) return;
+    if (!started) { started = true; try { song.currentTime = MUSIC_START; } catch (e) {} }
+    song.volume = 0;
+    song.play().then(() => {
+      setPlaying(true);
+      gsap.to(song, { volume: MUSIC_VOLUME, duration: 2.5, ease: "power1.out" });
+      gsap.killTweensOf(hint);
+      gsap.to(hint, { autoAlpha: 0, x: 10, duration: .3 });
+    }).catch(() => {});
+  }
+  function pause() {
+    setPlaying(false);
+    gsap.to(song, { volume: 0, duration: .5, onComplete: () => song.pause() });
+  }
+
+  // no music file → hide the button and the hint
+  const noMusic = () => { available = false; btn.style.display = "none"; hint.style.display = "none"; };
+  song.addEventListener("error", noMusic);
+  if (song.error) noMusic(); // the error may have fired before this script ran
+
+  btn.addEventListener("click", e => { e.stopPropagation(); song.paused ? play() : pause(); });
+  const firstTouch = e => {
+    if (e.target.closest && e.target.closest(".music")) return;
+    if (!started) play();
+    ["pointerdown", "keydown", "touchend"].forEach(t => removeEventListener(t, firstTouch, true));
+  };
+  ["pointerdown", "keydown", "touchend"].forEach(t => addEventListener(t, firstTouch, true));
+
+  // finale: crossfade into the last chorus (once)
+  ScrollTrigger.create({ trigger: "#finale", start: "top 55%", once: true, onEnter: () => {
+    if (!available) return;
+    if (song.paused) { started = true; try { song.currentTime = FINALE_AT; } catch (e) {} return; }
+    gsap.to(song, { volume: 0, duration: .6, overwrite: true, onComplete: () => {
+      song.currentTime = FINALE_AT;
+      gsap.to(song, { volume: MUSIC_VOLUME, duration: 1.4, ease: "power1.out" });
+    } });
+  } });
+
+  // invite the tap once the neon is on
+  gsap.fromTo(btn, { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, ease: "back.out(2)", duration: .6, delay: 2.2 });
+  gsap.fromTo(hint, { autoAlpha: 0, x: 20 }, { autoAlpha: 1, x: 0, duration: .5, delay: 2.6,
+    onComplete: () => { if (!started) gsap.to(hint, { y: -4, duration: .6, yoyo: true, repeat: -1, ease: "sine.inOut" }); } });
+})();
+
+document.fonts.ready.then(() => ScrollTrigger.refresh());
+</script>
+</body>
+</html>
